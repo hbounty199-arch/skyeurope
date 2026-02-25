@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyEurope Virtual Airlines</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue:   #073590;
+      --blue-lt:#0a45b5;
+      --white:  #ffffff;
+      --black:  #0a0a0a;
+      --grey:   #111827;
+      --mid:    #1e2a3a;
+      --accent: #f0c400;
+      --text:   #d0d8e8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+    h1,h2,h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 64px;
+      background: rgba(7,53,144,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 3px;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-gold { background: var(--accent); color: var(--black); }
+    .btn-gold:hover { background: #ffd700; transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,0.4);
+      margin-left: 12px;
+    }
+    .btn-outline:hover { border-color: var(--white); }
+
+    /* ── HERO ── */
+    header {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 60px 80px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(7,53,144,0.5) 0%, rgba(0,0,0,0.88) 100%),
+        url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1800&q=80') center/cover no-repeat;
+      animation: zoom 22s ease-in-out infinite alternate;
+    }
+    @keyframes zoom { from { transform: scale(1); } to { transform: scale(1.07); } }
+    .hero-stripe {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--accent) 50%, var(--blue) 100%);
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 700px; }
+    .hero-eyebrow {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    }
+    .hero-title {
+      font-size: clamp(4rem, 9vw, 8rem);
+      line-height: 0.9; color: var(--white); margin-bottom: 24px;
+    }
+    .hero-title em { font-style: normal; color: var(--accent); }
+    .hero-sub {
+      font-size: 1.05rem; font-weight: 300; color: var(--text);
+      line-height: 1.65; margin-bottom: 38px; max-width: 480px;
+    }
+
+    /* ── STATS BAR ── */
+    #stats {
+      background: var(--blue);
+      padding: 44px 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 28px;
+      text-align: center;
+    }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--white); }
+    .stat-lbl {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 4px;
+    }
+
+    /* ── SECTION BASE ── */
+    section { padding: 90px 60px; }
+    .section-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+    }
+    .section-title {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      color: var(--white); margin-bottom: 44px;
+    }
+
+    /* ── MAP ── */
+    #map { background: var(--grey); padding: 80px 60px; }
+    #map-wrap {
+      border-radius: 8px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      height: 560px; background: var(--mid);
+    }
+    #map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    /* ── SCHEDULE ── */
+    #schedule { background: var(--black); }
+    .table-wrap { overflow-x: auto; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead { background: var(--blue); }
+    thead th {
+      padding: 14px 20px; text-align: left;
+      font-weight: 700; font-size: 0.73rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
+    tbody tr:hover { background: rgba(7,53,144,0.25); }
+    tbody td { padding: 14px 20px; color: var(--text); }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .badge-active  { background: rgba(16,185,129,0.2); color: #34d399; }
+    .badge-charter { background: rgba(245,158,11,0.2);  color: #fbbf24; }
+    .badge-closed  { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.35); }
+
+    /* ── FLEET ── */
+    #fleet { background: var(--grey); }
+    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 22px; }
+    .fleet-card {
+      background: var(--mid); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 6px; overflow: hidden; transition: transform 0.2s, border-color 0.2s;
+    }
+    .fleet-card:hover { transform: translateY(-4px); border-color: rgba(7,53,144,0.7); }
+    .fleet-card-top {
+      background: linear-gradient(135deg, var(--blue) 0%, #051f6b 100%);
+      padding: 28px 22px 20px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; color: var(--white);
+      position: relative; overflow: hidden;
+    }
+    .fleet-card-top::after {
+      content: '✈'; position: absolute; right: -8px; bottom: -10px;
+      font-size: 5rem; opacity: 0.09; transform: rotate(-30deg);
+    }
+    .fleet-reg {
+      font-size: 0.72rem; font-family: 'Barlow', sans-serif;
+      font-weight: 700; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 4px;
+    }
+    .fleet-card-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; }
+    .fleet-row { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text); }
+    .fleet-row span:first-child { color: rgba(255,255,255,0.38); }
+
+    /* ── AIRPORTS ── */
+    #airports { background: var(--black); }
+    .airport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap: 14px; }
+    .airport-card {
+      background: var(--mid); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px; padding: 18px 22px;
+      display: flex; align-items: center; gap: 18px; transition: background 0.2s;
+    }
+    .airport-card:hover { background: rgba(7,53,144,0.35); }
+    .airport-icao { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; color: var(--accent); min-width: 56px; }
+    .airport-info h4 { font-size: 0.88rem; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+    .airport-info p  { font-size: 0.73rem; color: rgba(255,255,255,0.38); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--blue); padding: 52px 60px;
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px;
+    }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 10px; }
+    .footer-brand span { color: var(--accent); }
+    .footer-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+    .footer-col h5 {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: rgba(255,255,255,0.55); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom {
+      background: rgba(0,0,0,0.28); padding: 14px 60px;
+      font-size: 0.74rem; color: rgba(255,255,255,0.28);
+      display: flex; justify-content: space-between;
+    }
+    .empty-msg {
+      grid-column: 1/-1; text-align: center; padding: 50px;
+      color: rgba(255,255,255,0.2); font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      header, section, #map, #stats { padding: 60px 20px; }
+      footer { grid-template-columns: 1fr; padding: 40px 20px; }
+      .footer-bottom { flex-direction: column; gap: 6px; padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <a href="#home" class="nav-logo">Sky<span>Europe</span></a>
+    <ul class="nav-links">
+      <li><a href="#map">Live Map</a></li>
+      <li><a href="#schedule">Schedule</a></li>
+      <li><a href="#fleet">Fleet</a></li>
+      <li><a href="#airports">Airports</a></li>
+    </ul>
+    <a href="https://newsky.app/airline/ESK/info" target="_blank" class="btn btn-gold">Join Us ↗</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <header id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-stripe"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Virtual Airlines · Est. 2024</p>
+      <h1 class="hero-title">Sky<em>Europe</em></h1>
+      <p class="hero-sub">Europe's premier virtual airline. Fly iconic routes across 30+ destinations with a passionate community of pilots on NewSky.</p>
+      <a href="#schedule" class="btn btn-gold">View Schedule</a>
+      <a href="#map" class="btn btn-outline">Live Map</a>
+    </div>
+  </header>
+
+  <!-- ── STATS ──
+       ✏️  Change the numbers to match your real stats -->
+  <div id="stats">
+    <div>
+      <div class="stat-num">100+</div>
+      <div class="stat-lbl">Total Flights</div>
+    </div>
+    <div>
+      <div class="stat-num">8</div>
+      <div class="stat-lbl">Aircraft</div>
+    </div>
+    <div>
+      <div class="stat-num">18</div>
+      <div class="stat-lbl">Airports</div>
+    </div>
+    <div>
+      <div class="stat-num">35+</div>
+      <div class="stat-lbl">Routes</div>
+    </div>
+  </div>
+
+  <!-- ── LIVE MAP ── (powered by NewSky API key in the script) -->
+  <section id="map">
+    <p class="section-label">Operations</p>
+    <h2 class="section-title">Live Operations Map</h2>
+    <div id="map-wrap">
+      <iframe id="newsky-map" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <!-- ── SCHEDULE ──
+       ✏️  Copy the example <tr> block and fill in your real flights.
+           For the badge, use: badge-active / badge-charter / badge-closed -->
+  <section id="schedule">
+    <p class="section-label">Flights</p>
+    <h2 class="section-title">Flight Schedule</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Flight</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Departure</th>
+            <th>Duration</th>
+            <th>Aircraft</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- ✏️ DELETE THE EMPTY MESSAGE BELOW AND ADD YOUR ROWS HERE -->
+          <!-- Example (remove the comment markers to activate):
+          <tr>
+            <td><strong>SK101</strong></td>
+            <td>EGLL</td>
+            <td>LEMD</td>
+            <td>08:00</td>
+            <td>135 min</td>
+            <td>B737</td>
+            <td><span class="badge badge-active">Active</span></td>
+          </tr>
+          <tr>
+            <td><strong>SK204</strong></td>
+            <td>EIDW</td>
+            <td>LIRF</td>
+            <td>12:30</td>
+            <td>175 min</td>
+            <td>A320</td>
+            <td><span class="badge badge-charter">Charter</span></td>
+          </tr>
+          -->
+
+          <tr>
+            <td colspan="7" style="text-align:center;padding:40px;color:rgba(255,255,255,0.2);font-size:0.85rem;">
+              No flights added yet — see the HTML comments above to add your schedule.
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── FLEET ──
+       ✏️  Copy the example card block below and fill in your aircraft details. -->
+  <section id="fleet">
+    <p class="section-label">Aircraft</p>
+    <h2 class="section-title">Our Fleet</h2>
+    <div class="fleet-grid">
+
+      <!-- ✏️ DELETE THE EMPTY MESSAGE BELOW AND ADD YOUR CARDS HERE -->
+      <!-- Example (remove the comment markers to activate):
+      <div class="fleet-card">
+        <div class="fleet-card-top">
+          <div class="fleet-reg">EI-SKY</div>
+          Boeing 737-800
+        </div>
+        <div class="fleet-card-body">
+          <div class="fleet-row"><span>Range</span><span>3,115 nm</span></div>
+          <div class="fleet-row"><span>Capacity</span><span>189 pax</span></div>
+          <div class="fleet-row"><span>Engines</span><span>CFM56-7B</span></div>
+          <div class="fleet-row"><span>Status</span><span>Active</span></div>
+        </div>
+      </div>
+      -->
+
+      <div class="empty-msg">No aircraft added yet — see the HTML comments above to add your fleet.</div>
+
+    </div>
+  </section>
+
+  <!-- ── AIRPORTS ──
+       ✏️  Copy the example card block below and fill in your airport details. -->
+  <section id="airports">
+    <p class="section-label">Network</p>
+    <h2 class="section-title">Airport Network</h2>
+    <div class="airport-grid">
+            <div class="airport-card">
+        <div class="airport-icao">EGKK</div>
+        <div class="airport-info">
+          <h4>London Gatwick</h4>
+          <p>London, United Kingdom</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">EGPH</div>
+        <div class="airport-info">
+          <h4>Edinburgh Airport</h4>
+          <p>Edinburgh, United Kingdom</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">EGJJ</div>
+        <div class="airport-info">
+          <h4>Jersey Airport</h4>
+          <p>St. Peter, United Kingdom</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LECU</div>
+        <div class="airport-info">
+          <h4>Madrid-Cuatro Vientos Airport</h4>
+          <p>Madrid, Spain</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">EIDW</div>
+        <div class="airport-info">
+          <h4>Dublin Airport</h4>
+          <p>Dublin, Ireland</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LIRF</div>
+        <div class="airport-info">
+          <h4>Rome–Fiumicino Leonardo da Vinci International Airport</h4>
+          <p>Rome, Italy</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LIRN</div>
+        <div class="airport-info">
+          <h4>Naples International Airport</h4>
+          <p>Napoli, Italy</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">EDDB</div>
+        <div class="airport-info">
+          <h4>Berlin Brandenburg Airport</h4>
+          <p>Berlin, Germany</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">EDDF</div>
+        <div class="airport-info">
+          <h4>Frankfurt Airport</h4>
+          <p>Frankfurt, Germany</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">EDDN</div>
+        <div class="airport-info">
+          <h4>Nuremberg Airport</h4>
+          <p>Nuremberg, Germany</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LOWW</div>
+        <div class="airport-info">
+          <h4>Vienna International Airport</h4>
+          <p>Vienna, Austria</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LZIB</div>
+        <div class="airport-info">
+          <h4>M. R. Štefánik Airport</h4>
+          <p>Bratislava, Slovakia</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LZKZ</div>
+        <div class="airport-info">
+          <h4>Košice International Airport</h4>
+          <p>Košice, Slovakia</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LZTT</div>
+        <div class="airport-info">
+          <h4>Poprad-Tatry Airport</h4>
+          <p>Poprad, Slovakia</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">KJFK</div>
+        <div class="airport-info">
+          <h4>John F Kennedy International Airport</h4>
+          <p>New York, United Sates of America</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">OMDB</div>
+        <div class="airport-info">
+          <h4>Dubai International Airport</h4>
+          <p>Dubai, United Arab Emirates</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LFPG</div>
+        <div class="airport-info">
+          <h4>Charles de Gaulle International Airport</h4>
+          <p>Paris, France</p>
+        </div>
+      </div>
+       <div class="airport-card">
+        <div class="airport-icao">TBPB</div>
+        <div class="airport-info">
+          <h4>Grantley Adams International Airport</h4>
+          <p>Bridgetown, Barbados</p>
+        </div>
+      </div>
+      
+
+      <!-- ✏️ DELETE THE EMPTY MESSAGE BELOW AND ADD YOUR CARDS HERE -->
+      <!-- Example (remove the comment markers to activate):
+      <div class="airport-card">
+        <div class="airport-icao">EGLL</div>
+        <div class="airport-info">
+          <h4>London Heathrow</h4>
+          <p>London, United Kingdom</p>
+        </div>
+      </div>
+      <div class="airport-card">
+        <div class="airport-icao">LEMD</div>
+        <div class="airport-info">
+          <h4>Adolfo Suárez Madrid–Barajas</h4>
+          <p>Madrid, Spain</p>
+        </div>
+      </div>
+      -->
+
+      <div class="empty-msg">No airports added yet — see the HTML comments above to add your network.</div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div>
+      <div class="footer-brand">Sky<span>Europe</span></div>
+      <p class="footer-desc">A virtual airline built on passion, precision, and the love of European skies. Powered by NewSky.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Navigate</h5>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#map">Live Map</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#fleet">Fleet</a></li>
+        <li><a href="#airports">Airports</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Community</h5>
+      <ul>
+        <li><a href="https://newsky.app/airline/ESK/info" target="_blank">NewSky Platform</a></li>
+        <li><a href="#">Discord</a></li>
+        <li><a href="https://vatsim-radar.com/">VATSIM</a></li>
+        <li><a href="https://www.ivao.aero/">IVAO</a></li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span>© 2025 SkyEurope Virtual Airlines. All rights reserved.</span>
+    <span>Powered by NewSky</span>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════════════
+    // 🔑 PASTE YOUR NEWSKY API KEY BETWEEN THE QUOTES BELOW
+    const API_KEY = 'ESK_dd1JttG4HyEfe5gaJ8JHlNJ2cUTbJU';
+    // ══════════════════════════════════════════════════════════
+
+    // Loads the live operations map — nothing else touches the API
+    document.getElementById('newsky-map').src =
+      `https://newsky.app/airline/public/map?style=dark&token=${API_KEY}`;
+  </script>
+
+</body>
+</html>
